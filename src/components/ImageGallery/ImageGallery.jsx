@@ -1,13 +1,18 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types';
 
 import { ImageGalleryItem } from 'components/ImageGalleryItem';
 import { Button } from 'components/Button';
-import { getImagesBySearchQuery } from 'services/api';
-
 import { StyledImageGallery } from './ImageGallery.styled';
 import { Loader } from 'components/Loader/Loader';
 
+import { getImagesBySearchQuery } from 'services/api';
+
 export class ImageGallery extends Component {
+  static propTypes = {
+    searchQuery: PropTypes.string.isRequired,
+  };
+
   state = {
     images: [],
     page: 1,
@@ -96,7 +101,7 @@ export class ImageGallery extends Component {
               />
             ))}
           </StyledImageGallery>
-          <Button loadMore={this.loadMore} />
+          <Button onClick={this.loadMore} />
         </>
       );
     }

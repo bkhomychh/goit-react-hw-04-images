@@ -1,11 +1,10 @@
-import { Component } from 'react';
+import { PureComponent } from 'react';
 
 import { SearchBar } from 'components/SearchBar';
 import { ImageGallery } from 'components/ImageGallery';
-
 import { StyledApp } from './App.styled';
 
-export class App extends Component {
+export class App extends PureComponent {
   state = {
     searchQuery: '',
   };

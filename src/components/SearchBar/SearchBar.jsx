@@ -1,8 +1,13 @@
 import { Component } from 'react';
+import PropTypes from 'prop-types';
 
 import { StyledSearchBar, Form, Button, Input, Span } from './SearchBar.styled';
 
 export class SearchBar extends Component {
+  static propTypes = {
+    onSubmit: PropTypes.func.isRequired,
+  };
+
   handleSubmit = evt => {
     evt.preventDefault();
 
