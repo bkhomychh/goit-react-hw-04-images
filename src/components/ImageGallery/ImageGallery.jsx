@@ -11,31 +11,23 @@ import { getImagesBySearchQuery } from 'services/api';
 export class ImageGallery extends Component {
   static propTypes = {
     searchQuery: PropTypes.string.isRequired,
+    page: PropTypes.number.isRequired,
+    increasePageNumber: PropTypes.func.isRequired,
   };
 
   state = {
     images: [],
-    page: 1,
     status: 'idle',
     error: null,
   };
 
-  async componentDidUpdate(prevProps, prevState) {
-    const prevSearchQuery = prevProps.searchQuery;
-    const prevPageNumber = prevState.page;
+  async componentDidUpdate(prevProps) {
+    const { page: prevPage, searchQuery: prevSearchQuery } = prevProps;
+    const { page: currentPage, searchQuery: currentSearchQuery } = this.props;
 
-    const currentSearchQuery = this.props.searchQuery;
-    const currentPageNumber = this.state.page;
-
-    console.log(prevPageNumber);
-    console.log(currentPageNumber);
-
-    if (prevSearchQuery !== currentSearchQuery) {
-      await this.setState({ page: 1 });
-      this.loadImages(currentSearchQuery);
-    } else if (
-      prevSearchQuery === currentSearchQuery &&
-      prevPageNumber !== currentPageNumber
+    if (
+      prevSearchQuery !== currentSearchQuery ||
+      (prevSearchQuery === currentSearchQuery && prevPage !== currentPage)
     ) {
       this.loadImages(currentSearchQuery);
     }
@@ -45,8 +37,7 @@ export class ImageGallery extends Component {
     try {
       this.setState({ status: 'pending' });
 
-      const pageNumber = this.state.page;
-      console.log('pageNumber ' + pageNumber);
+      const pageNumber = this.props.page;
       const images = await getImagesBySearchQuery(
         currentSearchQuery,
         pageNumber
@@ -65,14 +56,9 @@ export class ImageGallery extends Component {
     }
   };
 
-  increasePageNumber = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
-  };
-
   render() {
     const { images, status, error } = this.state;
+    const { increasePageNumber } = this.props;
 
     if (status === 'idle') {
       return;
@@ -115,7 +101,7 @@ export class ImageGallery extends Component {
               />
             ))}
           </StyledImageGallery>
-          <Button onClick={this.increasePageNumber} />
+          <Button onClick={increasePageNumber} />
         </>
       );
     }
