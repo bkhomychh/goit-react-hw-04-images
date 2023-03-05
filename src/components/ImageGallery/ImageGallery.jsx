@@ -29,32 +29,27 @@ export class ImageGallery extends Component {
       prevSearchQuery !== currentSearchQuery ||
       (prevSearchQuery === currentSearchQuery && prevPage !== currentPage)
     ) {
-      this.loadImages(currentSearchQuery);
+      try {
+        this.setState({ status: 'pending' });
+
+        const images = await getImagesBySearchQuery(
+          currentSearchQuery,
+          currentPage
+        );
+
+        if (currentPage === 1) {
+          this.setState({ images, status: 'resolved' });
+        } else {
+          this.setState(prevState => ({
+            images: [...prevState.images, ...images],
+            status: 'resolved',
+          }));
+        }
+      } catch (error) {
+        this.setState({ error, status: 'rejected' });
+      }
     }
   }
-
-  loadImages = async currentSearchQuery => {
-    try {
-      this.setState({ status: 'pending' });
-
-      const pageNumber = this.props.page;
-      const images = await getImagesBySearchQuery(
-        currentSearchQuery,
-        pageNumber
-      );
-
-      if (pageNumber === 1) {
-        this.setState({ images, status: 'resolved' });
-      } else {
-        this.setState(prevState => ({
-          images: [...prevState.images, ...images],
-          status: 'resolved',
-        }));
-      }
-    } catch (error) {
-      this.setState({ error, status: 'rejected' });
-    }
-  };
 
   render() {
     const { images, status, error } = this.state;
