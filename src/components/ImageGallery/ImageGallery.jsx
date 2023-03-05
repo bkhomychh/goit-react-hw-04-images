@@ -20,41 +20,55 @@ export class ImageGallery extends Component {
     error: null,
   };
 
-  async componentDidUpdate(prevProps) {
+  async componentDidUpdate(prevProps, prevState) {
     const prevSearchQuery = prevProps.searchQuery;
+    const prevPageNumber = prevState.page;
+
     const currentSearchQuery = this.props.searchQuery;
+    const currentPageNumber = this.state.page;
 
-    if (prevSearchQuery === currentSearchQuery) {
-      return;
-    }
+    console.log(prevPageNumber);
+    console.log(currentPageNumber);
 
-    try {
-      this.setState({ status: 'pending', images: [] });
-
-      const images = await getImagesBySearchQuery(currentSearchQuery, 1);
-
-      this.setState({ images, page: 2, status: 'resolved' });
-    } catch (error) {
-      this.setState({ error, status: 'rejected' });
+    if (prevSearchQuery !== currentSearchQuery) {
+      await this.setState({ page: 1 });
+      this.loadImages(currentSearchQuery);
+    } else if (
+      prevSearchQuery === currentSearchQuery &&
+      prevPageNumber !== currentPageNumber
+    ) {
+      this.loadImages(currentSearchQuery);
     }
   }
 
-  loadMore = async () => {
+  loadImages = async currentSearchQuery => {
     try {
       this.setState({ status: 'pending' });
 
-      const { searchQuery } = this.props;
-      const { page } = this.state;
-      const images = await getImagesBySearchQuery(searchQuery, page);
+      const pageNumber = this.state.page;
+      console.log('pageNumber ' + pageNumber);
+      const images = await getImagesBySearchQuery(
+        currentSearchQuery,
+        pageNumber
+      );
 
-      this.setState(prevState => ({
-        images: [...prevState.images, ...images],
-        page: prevState.page + 1,
-        status: 'resolved',
-      }));
+      if (pageNumber === 1) {
+        this.setState({ images, status: 'resolved' });
+      } else {
+        this.setState(prevState => ({
+          images: [...prevState.images, ...images],
+          status: 'resolved',
+        }));
+      }
     } catch (error) {
       this.setState({ error, status: 'rejected' });
     }
+  };
+
+  increasePageNumber = () => {
+    this.setState(prevState => ({
+      page: prevState.page + 1,
+    }));
   };
 
   render() {
@@ -101,7 +115,7 @@ export class ImageGallery extends Component {
               />
             ))}
           </StyledImageGallery>
-          <Button onClick={this.loadMore} />
+          <Button onClick={this.increasePageNumber} />
         </>
       );
     }
