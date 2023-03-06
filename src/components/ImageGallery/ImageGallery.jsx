@@ -30,6 +30,9 @@ export class ImageGallery extends Component {
       (prevSearchQuery === currentSearchQuery && prevPage !== currentPage)
     ) {
       try {
+        if (currentPage === 1) {
+          this.setState({ images: [] });
+        }
         this.setState({ status: 'pending' });
 
         const images = await getImagesBySearchQuery(
@@ -37,14 +40,10 @@ export class ImageGallery extends Component {
           currentPage
         );
 
-        if (currentPage === 1) {
-          this.setState({ images, status: 'resolved' });
-        } else {
-          this.setState(prevState => ({
-            images: [...prevState.images, ...images],
-            status: 'resolved',
-          }));
-        }
+        this.setState(prevState => ({
+          images: [...prevState.images, ...images],
+          status: 'resolved',
+        }));
       } catch (error) {
         this.setState({ error, status: 'rejected' });
       }
