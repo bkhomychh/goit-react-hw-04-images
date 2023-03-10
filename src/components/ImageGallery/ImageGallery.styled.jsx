@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const StyledImageGallery = styled.ul`
+export const StyledImageList = styled.ul`
   padding: 0 20px;
   margin-top: 0;
   margin-bottom: 0;

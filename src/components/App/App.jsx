@@ -1,37 +1,32 @@
-import { PureComponent } from 'react';
+import { useState, memo } from 'react';
 
 import { SearchBar } from 'components/SearchBar';
 import { ImageGallery } from 'components/ImageGallery';
 import { StyledApp } from './App.styled';
 
-export class App extends PureComponent {
-  state = {
-    searchQuery: '',
-    page: 1,
+const App = () => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [pageNumber, setPageNumber] = useState(1);
+
+  const updateSearchQuery = newSearchQuery => {
+    setSearchQuery(newSearchQuery);
+    setPageNumber(1);
   };
 
-  updateSearchQuery = newSearchQuery => {
-    this.setState({ searchQuery: newSearchQuery, page: 1 });
+  const increasePageNumber = () => {
+    setPageNumber(prevState => prevState + 1);
   };
 
-  increasePageNumber = () => {
-    this.setState(prevState => ({
-      page: prevState.page + 1,
-    }));
-  };
+  return (
+    <StyledApp>
+      <SearchBar onSubmit={updateSearchQuery} />
+      <ImageGallery
+        searchQuery={searchQuery}
+        pageNumber={pageNumber}
+        increasePageNumber={increasePageNumber}
+      ></ImageGallery>
+    </StyledApp>
+  );
+};
 
-  render() {
-    const { searchQuery, page } = this.state;
-
-    return (
-      <StyledApp>
-        <SearchBar onSubmit={this.updateSearchQuery} />
-        <ImageGallery
-          searchQuery={searchQuery}
-          page={page}
-          increasePageNumber={this.increasePageNumber}
-        ></ImageGallery>
-      </StyledApp>
-    );
-  }
-}
+export default memo(App);
